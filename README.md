@@ -62,10 +62,70 @@ For the univariate analysis, I created a histogram that visualizes the distribut
 
 
 ### Bivariate Analysis
-Fpr the bivariate analysis, I created a scatter plot that visualizes the relationship between preperation time and average_rating. The scatter plot shows that recipes receive high average ratings are clustered at the 5-star mark across all time ranges, but mostly in the low preperation time range. One potention reason is that most data we had didn't have super long preperation time, and user really like to rate 5 star for the recipe, so we can't say there is a clear correlation between preparation time and average rating right now.
+For the bivariate analysis, I created a scatter plot that visualizes the relationship between preperation time and average_rating. The scatter plot shows that recipes receive high average ratings are clustered at the 5-star mark across all time ranges, but mostly in the low preperation time range. One potention reason is that most data we had didn't have super long preperation time, and user really like to rate 5 star for the recipe, so we can't say there is a clear correlation between preparation time and average rating right now.
 <iframe
   src="assets/fig2.html"
   width="800"
   height="600"
   frameborder="0"
 ></iframe>
+
+### Interesting Aggregates
+For the aggregates analysis I created a table that identifies the top 10 recipe contributors by volume, revealing that the most prolific users (submitting 1,680-3,060 recipes each) consistently maintain exceptional ratings between 4.72-4.85 stars, with median prep times of 25-55 minutes. The results highlight both the platform's reliance on a small group of super-users for quality content and a potential positivity bias in ratings, as no top contributor averaged below 4.7 stars despite varying recipe volumes and preparation times.
+
+
+|   recipe_count |   average_rating |   minutes |
+|---------------:|-----------------:|----------:|
+|           3060 |          4.78761 |        25 |
+|           2754 |          4.84693 |        42 |
+|           2503 |          4.80217 |        23 |
+|           2436 |          4.78994 |        40 |
+|           2368 |          4.76688 |        30 |
+|           2310 |          4.82568 |        27 |
+|           1867 |          4.81609 |        35 |
+|           1795 |          4.77882 |        25 |
+|           1711 |          4.71974 |        55 |
+|           1680 |          4.85124 |        30 |
+
+
+
+
+## Assessment of Missingness
+### NMAR Analysis
+The review column is likely NMAR (Not Missing At Random) because its missingness depends on the unobserved true sentiment of users—people may skip writing reviews when they feel ambivalent or dissatisfied, but this reason is not captured in the data. To make it MAR (Missing At Random), we would need additional data such as the time spent on recipe page or the clicks user made.
+
+### Missingness Dependency
+I investigated whether missing descriptions depend on recipe attributes by conducting two permutation tests:
+Prep Time (minutes): Tested if recipes with missing descriptions have systematically different prep times.
+Rating (rating): Tested if missing descriptions correlate with recipe ratings.
+
+> Description and Prep Time (minutes)
+Null Hypothesis (H₀): Description missingness is independent of prep time.
+Alternative Hypothesis (H₁): Recipes with missing descriptions have different average prep times.
+Test Statistic: Absolute difference in mean prep time (missing vs. non-missing).
+Significance Level: α = 0.05
+Result: p = 0.462 → Fail to reject H₀
+Conclusion: No evidence that prep time affects description missingness.
+<iframe
+  src="assets/fig3.html"
+  width="800"
+  height="600"
+  frameborder="0"
+></iframe>
+From the graph it can be seen that the distribution of prep time with description and without description look similar, meaning the missingness of description doesn't affect the overall shape of prep time distribution.
+
+> Description and rating
+Null Hypothesis (H₀): Description missingness is independent of rating.
+Alternative Hypothesis (H₁): Recipes with missing descriptions have different average ratings.
+Test Statistic: Absolute difference in mean ratings (missing vs. non-missing).
+Significance Level: α = 0.05
+Result: p = 0.014 → Reject H₀
+Conclusion: Missing descriptions correlate with ratings (likely NMAR). Lower-rated recipes may lack descriptions because contributors invest less effort in unpopular recipes.
+<iframe
+  src="assets/fig4.html"
+  width="800"
+  height="600"
+  frameborder="0"
+></iframe>
+From the graph it can be seen that the distribution of rating with description and without description look very different, meaning the missingness of description is indeed related to rating and could affect the shape of rating distribution.
+
