@@ -32,6 +32,7 @@ We analyze two interconnected datasets from Food.com:
 Key Insight: The nutrition data uses Percentage Daily Values (PDV). I will add a column called protein_gram that converts protein to grams for interpretability
 
 2. Interactions Dataset (731,927 reviews × 5 columns)
+
 | Column        | Description         |
 | :------------ | :------------------ |
 | `'user_id'`   | User ID             |
