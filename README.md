@@ -1,4 +1,4 @@
-# This project analyzes recipes to predict ratings based on prep time and nutrition.
+# How does different features of a recipe (nutrition, rating, calories, preperation_time) relate to each other.
 Author Junran Yang
 ## Overview and Introduction  
 **DSC80 Final Project | UCSD**  
