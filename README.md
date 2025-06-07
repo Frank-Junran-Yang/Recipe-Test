@@ -59,3 +59,13 @@ For the univariate analysis, I created a histogram that visualizes the distribut
   height="600"
   frameborder="0"
 ></iframe>
+
+
+### Bivariate Analysis
+Fpr the bivariate analysis, I created a scatter plot that visualizes the relationship between preperation time and average_rating. The scatter plot shows that recipes receive high average ratings are clustered at the 5-star mark across all time ranges, but mostly in the low preperation time range. One potention reason is that most data we had didn't have super long preperation time, and user really like to rate 5 star for the recipe, so we can't say there is a clear correlation between preparation time and average rating right now.
+<iframe
+  src="assets/fig2.html"
+  width="800"
+  height="600"
+  frameborder="0"
+></iframe>
