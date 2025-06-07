@@ -10,7 +10,7 @@ Can we accurately predict calories from nutritional features?
 Are there biases in how recipes are rated or described?
 This work combines exploratory analysis, hypothesis testing, and predictive modeling to uncover insights for health-conscious cooks and data scientists alike.
 
-We analyze two interconnected datasets from Food.com:
+I analyze two interconnected datasets from Food.com:
 
 1. Recipes Dataset (83,782 recipes × 12 columns)
 
@@ -129,3 +129,77 @@ Conclusion: Missing descriptions correlate with ratings (likely NMAR). Lower-rat
 ></iframe>
 From the graph it can be seen that the distribution of rating with description and without description look very different, meaning the missingness of description is indeed related to rating and could affect the shape of rating distribution.
 
+## Hypothesis Testing
+I am interested in whether recipes with different protein content tend to have different preparation times. Specifically, I want to know if high-protein recipes take longer to prepare than low-protein ones.
+
+Null Hypothesis: High-protein and low-protein recipes take the same amount of time to prepare on average.
+Alternative Hypothesis: High-protein recipes take longer to prepare than low-protein recipes.
+Test Statistic: The difference in mean preparation time between high-protein and low-protein recipes.
+Significance Level: 0.05
+
+I chose a permutation test because I want to assess whether the observed difference in means could arise purely by chance under the null hypothesis. I split the recipes into two groups based on whether their protein content is above or below the median protein value. The observed difference in average preparation time was computed, and  then randomly shuffled the minutes column 500 times to simulate the distribution of mean differences under the null.
+
+The resulting p-value was 0.26, meaning that 26% of the time, a difference as extreme or more extreme than the observed difference would occur by chance. Since this p-value is greater than our chosen significance level of 0.05, we fail to reject the null hypothesis. This suggests that there is not enough evidence to conclude that high-protein recipes take longer to prepare than low-protein ones. The test and design choices are appropriate for answering our question because they directly compare the means of two comparable groups under minimal assumptions, allowing us to assess if any observed difference is likely due to random variation.
+
+
+## Framing a Prediction Problem
+I plan to predict the calorie content of recipes using nutritional features, framing this as a regression problem since calories are continuous values. The response variable is calories—a critical metric for dietary planning—and I’ve chosen it because I often estimate meals based on partial ingredient data (e.g., sugar or protein amounts) rather than exact measurements.
+To evaluate performance, I’ll use:
+RMSE (Root Mean Squared Error): To quantify average prediction error in interpretable calorie units, prioritizing precise estimates for health tracking.
+R² score: To measure how well the model explains calorie variance compared to a baseline.
+I’ll use available nutritional features (sugar, protein, fat, etc.) and recipe attributes (minutes, n_steps) as predictors, since these are known before cooking—mirroring real-world scenarios where I might tweak ingredients. The model’s goal is to help make informed decisions even when exact measurements are unavailable.
+
+## Baseline Model
+My baseline uses a simple linear regression with two quantitative features: protein (grams) and sugar (grams), both standardized via StandardScaler. No encoding was needed since these are numeric values. The model achieves:
+
+Train RMSE: 763.64
+Test RMSE: 315.35 calories
+R²: 0.73 on test data, 0.72 on train data.
+
+While the R² indicates a moderately strong relationship, the large train-test RMSE gap raises concerns about overfitting or split randomness. My model’s strength lies in its simplicity—using only two intuitive features, but future iterations should incorporate more nutritional variables (e.g., fat, carbs) to improve accuracy.
+
+## Final Model
+Final Model Features
+'has_goodtag'
+This binary feature identifies recipes likely to be desserts/sweets by checking reviews for terms like 'sugar' or 'dessert'. We included it because desserts typically have distinct calorie profiles due to higher sugar/fat content. The feature was one-hot encoded to avoid imposing ordinal relationships.
+
+'n_steps' (binarized)
+I transformed this into a binary feature (≥9 steps = complex) because intricate recipes often use more calorie-dense ingredients (e.g., sauces, layered components). This aligns with culinary intuition that complex preparations tend to be richer.
+
+Nutritional features ('protein', 'sugar', etc.)
+I included five standardized nutritional components (protein, sugar, sodium, saturated_fat, carbohydrates) because calories derive directly from macronutrients (4 cal/g for protein/carbs, 9 cal/g for fat). Polynomial features (degree=1) were tested but not used, as cross-validation showed higher degrees increased overfitting without improving RMSE.
+
+Modeling and Hyperparameter Tuning
+I used linear regression for its interpretability and alignment with nutritional science (calorie calculation is inherently linear). The key hyperparameter—polynomial degree—was selected via 5-fold cross-validation (minimizing RMSE), with degree=1 performing best. This suggests calorie predictions rely primarily on additive nutrient contributions rather than complex interactions.
+
+
+Using linear regression with polynomial features (degree=1), selected via 5-fold cross-validation (minimizing RMSE), the model achieves:
+Test RMSE: 166.06 calories (47% lower than baseline)
+Test R²: 0.926 (27% improvement over baseline)
+
+The near-identical train/test scores (RMSE: 157.16 vs 166.06, R²: 0.926 vs 0.926) suggest much better generalization.
+
+## Fairness Analysis
+For the fairness evaluation, I split recipes into two groups:
+Group X (Meat recipes): Recipes containing meat, identified by tags like 'beef', 'chicken', or 'fish'.
+Group Y (Non-meat recipes): All other recipes.
+
+I evaluated RMSE parity between these groups because calorie prediction errors could mislead dietary choices—for example, underestimating calories in meat dishes might encourage overconsumption, while overestimating vegetarian recipes could unnecessarily deter healthier options.
+
+Hypotheses:
+Null (H₀): The model is fair. Its RMSE for meat and non-meat recipes is equal, and any differences are due to random chance.
+Alternative (H₁): The model is unfair. Its RMSE differs between meat and non-meat recipes.
+
+Test Design:
+Test Statistic: Absolute difference in RMSE.
+Significance Level: 0.05.
+Permutation Tests: 500 shuffles of the has_meat labels to simulate H₀.
+
+Results:
+
+Observed Difference: 17.023214562489272 calories.
+
+p-value: 0.262 (> 0.05).
+
+Conclusion:
+We fail to reject H₀ (p > 0.05), finding no statistically significant evidence of unfairness. The model’s calorie predictions are similarly accurate for meat and non-meat recipes, with RMSE differences likely due to chance.
