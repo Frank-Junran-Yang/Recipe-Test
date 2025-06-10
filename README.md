@@ -100,6 +100,7 @@ Prep Time (minutes): Tested if recipes with missing descriptions have systematic
 Rating (rating): Tested if missing descriptions correlate with recipe ratings.
 
 > Description and Prep Time (minutes)
+
 Null Hypothesis (H₀): Description missingness is independent of prep time.
 Alternative Hypothesis (H₁): Recipes with missing descriptions have different average prep times.
 Test Statistic: Absolute difference in mean prep time (missing vs. non-missing).
@@ -115,6 +116,7 @@ Conclusion: No evidence that prep time affects description missingness.
 From the graph it can be seen that the distribution of prep time with description and without description look similar, meaning the missingness of description doesn't affect the overall shape of prep time distribution.
 
 > Description and rating
+
 Null Hypothesis (H₀): Description missingness is independent of rating.
 Alternative Hypothesis (H₁): Recipes with missing descriptions have different average ratings.
 Test Statistic: Absolute difference in mean ratings (missing vs. non-missing).
